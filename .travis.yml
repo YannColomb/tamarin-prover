@@ -51,6 +51,7 @@ install:
 script:
   - tamarin-prover test
   # - make sapic-case-studies
+  - python3 autoTest.py
 
 notifications:
   slack:
