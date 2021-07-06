@@ -41,6 +41,7 @@ NO_DUPLICATE = False
 OPT_DFF = False
 OPT_YES = False
 OPT_NOD = False
+OPT_NOM = False
 
 SUCCESS = 0
 FAIL = -1
@@ -64,7 +65,7 @@ def files():
 
 ## Split a file, remove "diff" display from the main diff command ##
 def splitFile(filename) :
-    pat = "diff -r '--color=never'"
+    pat = "diff -r"
     if EXCEPT_DIR != None :
         for dir in EXCEPT_DIR :
             pat += " '--exclude=" + dir + "'"
@@ -158,20 +159,20 @@ def processTimeResults() :
                 elif OPT_WRITE_ALL_TIMES :
                     if OPT_WRITE_FILENAME :
                         finalTimeFile.write(filename)
-                    colorWrite(bcolors.OKBLUE, "1old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
+                    colorWrite(bcolors.OKBLUE, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
                 elif GRADUATION_TIME :
                     if OPT_WRITE_FILENAME :
                         finalTimeFile.write(filename)
                     if abs((time1 - time2)/time1) <= GRADUATION_TIME[0] :
-                        colorWrite(bcolors.OKGREEN, "2old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
+                        colorWrite(bcolors.OKGREEN, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
                     elif GRADUATION_TIME[0] < abs((time1 - time2)/time1) <= GRADUATION_TIME[1] :
-                        colorWrite(bcolors.WARNING, "2old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
+                        colorWrite(bcolors.WARNING, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
                     elif GRADUATION_TIME[1] < abs((time1 - time2)/time1) :
-                        colorWrite(bcolors.FAIL, "2old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
+                        colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
                 elif abs((time1 - time2)/time1) >= OPT_TIME_GAP :
                     if OPT_WRITE_FILENAME :
                         finalTimeFile.write(filename)
-                    colorWrite(bcolors.FAIL, "3old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
+                    colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
             cpt = 0
         cpt += 1
         
@@ -238,6 +239,7 @@ def main() :
     parser.add_argument("-dff", "--delete-final-files", help = "Delete final files to keep a proper working directory", action="store_true")
     parser.add_argument("-yes", "--accept-recommanded-deletions", help = "Delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results.", action="store_true")
     parser.add_argument("-nod", "--no-delete", help = "Temporary files won't be deleted", action="store_true")
+    parser.add_argument("-nom", "--no-make", help = "No make will be used. Only use if your working directories are already created.", action="store_true")
 
     args = parser.parse_args()
     
@@ -275,6 +277,8 @@ def main() :
         listOfGlobals["OPT_YES"] = True
     if args.no_delete :
         listOfGlobals["OPT_NOD"] = True
+    if args.no_make :
+        listOfGlobals["OPT_NOM"] = True
 
     ## Init ##
 
@@ -297,14 +301,18 @@ def main() :
 
 
 
+    ## Make case studies ##
+
+    if not OPT_NOM :
+        if args.fast :
+            os.system("make fast-case-studies FAST=f 2>/dev/null")
+        else :
+            os.system("make case-studies 2>/dev/null")
+    
+    
     ## Put all diff result in a file and format it into multiple files in a tmp directory ##
 
-    if args.fast :
-        os.system("make fast-case-studies FAST=f 2>/dev/null")
-    else :
-        os.system("make case-studies 2>/dev/null")
-    
-    
+
     excluded = ""
     if args.except_dir :
         for dir in EXCEPT_DIR :
@@ -317,7 +325,7 @@ def main() :
             if not "case-studies-regression/fast-tests/" in EXCEPT_DIR :
                 EXCEPT_DIR.append("case-studies-regression/fast-tests/")
 
-    os.system("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r --color=never " + excluded + " > " + filename) 
+    os.system("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename) 
 
     splitFile(filename)
     
