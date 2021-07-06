@@ -300,9 +300,9 @@ def main() :
     ## Put all diff result in a file and format it into multiple files in a tmp directory ##
 
     if args.fast :
-        os.system("make fast-case-studies FAST=f")
+        os.system("make fast-case-studies FAST=f 2>/dev/null")
     else :
-        os.system("make case-studies")
+        os.system("make case-studies 2>/dev/null")
     
     
     excluded = ""
