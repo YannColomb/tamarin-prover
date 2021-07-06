@@ -299,7 +299,12 @@ def main() :
 
     ## Put all diff result in a file and format it into multiple files in a tmp directory ##
 
-    #os.system("make case-studies") #TODO uncomment
+    if args.fast :
+        os.system("make fast-case-studies FAST=f")
+    else :
+        os.system("make case-studies")
+    
+    
     excluded = ""
     if args.except_dir :
         for dir in EXCEPT_DIR :

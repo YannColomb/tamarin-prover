@@ -5,7 +5,7 @@ TAMARIN=~/.local/bin/tamarin-prover
 SAPIC=~/.local/bin/sapic
 
 # Settings for fast testing
-ifneq ($(FAST), "f")  
+ifneq ($(FAST), "y")  
 	SUBDIR=""
 else
 	SUBDIR="fast-tests/"
