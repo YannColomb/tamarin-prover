@@ -131,7 +131,7 @@ def extractFloat(line) :
 
 ## Parse the file of processing times and write in another file a pretty version for display ##
 def processTimeResults() :
-    fileTime = open(outTestsTime, "r")
+    fileTime = open(outTestsTime, "r+")
     finalTimeFile = open(finalTime, "w")
 
     cpt = 1
@@ -175,6 +175,9 @@ def processTimeResults() :
                     colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
             cpt = 0
         cpt += 1
+
+    fileTime.close()
+    finalTimeFile.close()
         
 
 ## Take a file and create another file avoiding repetition of lines ##
