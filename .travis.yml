@@ -51,6 +51,5 @@ install:
 script:
   - tamarin-prover test
   # - make sapic-case-studies
-  - echo `ls`
   - python3 autoTest.py --except-dir=sapic,dh,system.info -yes -f -notime -nofn
   - echo `ls`

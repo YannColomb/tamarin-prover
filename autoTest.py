@@ -131,7 +131,7 @@ def extractFloat(line) :
 
 ## Parse the file of processing times and write in another file a pretty version for display ##
 def processTimeResults() :
-    fileTime = open(outTestsTime, "r+")
+    fileTime = open(outTestsTime, "r")
     finalTimeFile = open(finalTime, "w")
 
     cpt = 1
@@ -298,9 +298,10 @@ def main() :
         if os.path.exists(fn) :
             if OPT_YES :
                 os.system("rm " + fn)
+                os.system("touch " + fn) # for travis
             elif queryYesNo("File " + fn + " already exists. It may compromise your results. Do you want to delete it ?") :
                 os.system("rm " + fn)
-
+                os.system("touch " + fn) # for travis
 
 
     ## Make case studies ##
