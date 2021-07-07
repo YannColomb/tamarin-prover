@@ -152,27 +152,26 @@ def processTimeResults() :
                 cpt += 1
                 continue
             time2 = extractFloat(line)[0]
-        if cpt == 5 :
-            if OPT_TIME :
-                if time1 == 0 or time2 == 0 :
-                    print("ERROR : file : " + filename + " contains a null time")
-                elif OPT_WRITE_ALL_TIMES :
-                    if OPT_WRITE_FILENAME :
-                        finalTimeFile.write(filename)
-                    colorWrite(bcolors.OKBLUE, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
-                elif GRADUATION_TIME :
-                    if OPT_WRITE_FILENAME :
-                        finalTimeFile.write(filename)
-                    if abs((time1 - time2)/time1) <= GRADUATION_TIME[0] :
-                        colorWrite(bcolors.OKGREEN, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
-                    elif GRADUATION_TIME[0] < abs((time1 - time2)/time1) <= GRADUATION_TIME[1] :
-                        colorWrite(bcolors.WARNING, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
-                    elif GRADUATION_TIME[1] < abs((time1 - time2)/time1) :
-                        colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
-                elif abs((time1 - time2)/time1) >= OPT_TIME_GAP :
-                    if OPT_WRITE_FILENAME :
-                        finalTimeFile.write(filename)
-                    colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
+        if cpt == 5 :            
+            if time1 == 0 or time2 == 0 :
+                print("ERROR : file : " + filename + " contains a null time")
+            elif OPT_WRITE_ALL_TIMES :
+                if OPT_WRITE_FILENAME :
+                    finalTimeFile.write(filename)
+                colorWrite(bcolors.OKBLUE, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
+            elif GRADUATION_TIME :
+                if OPT_WRITE_FILENAME :
+                    finalTimeFile.write(filename)
+                if abs((time1 - time2)/time1) <= GRADUATION_TIME[0] :
+                    colorWrite(bcolors.OKGREEN, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
+                elif GRADUATION_TIME[0] < abs((time1 - time2)/time1) <= GRADUATION_TIME[1] :
+                    colorWrite(bcolors.WARNING, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
+                elif GRADUATION_TIME[1] < abs((time1 - time2)/time1) :
+                    colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
+            elif abs((time1 - time2)/time1) >= OPT_TIME_GAP :
+                if OPT_WRITE_FILENAME :
+                    finalTimeFile.write(filename)
+                colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
             cpt = 0
         cpt += 1
 
@@ -358,12 +357,13 @@ def main() :
     
     ## Create a file with processing times before and after ##
 
-    processTimeResults()
+    if OPT_TIME :
+        processTimeResults()
 
     ## Displays ##
  
 
-    if DISPLAY_TIMES :
+    if DISPLAY_TIMES and OPT_TIME :
         if NO_DUPLICATE :
             infn = finalTime
             outfn = "times.tmp"
@@ -390,14 +390,15 @@ def main() :
         colorPrint(bcolors.BOLD,"All tests passed !")
         if not OPT_NOD :
             os.system("rm " + outTestsErrors)
-        if OPT_DFF and not OPT_NOD :
+        if OPT_DFF and OPT_TIME and not OPT_NOD :
             os.system("rm " + finalTime)
         return SUCCESS
     else :
         print("Tests failed with " + str(nbrLines) + " lines")
         if OPT_DFF and not OPT_NOD :
             os.system("rm " + outTestsErrors)
-            os.system("rm " + finalTime)
+            if OPT_TIME :
+                os.system("rm " + finalTime)
         return FAIL
 
     
