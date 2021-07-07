@@ -298,17 +298,14 @@ def main() :
         if os.path.exists(fn) :
             if OPT_YES :
                 os.system("rm " + fn)
-                os.system("touch " + fn) # for travis
             elif queryYesNo("File " + fn + " already exists. It may compromise your results. Do you want to delete it ?") :
                 os.system("rm " + fn)
-                os.system("touch " + fn) # for travis
 
 
     ## Make case studies ##
 
     if not OPT_NOM :
         if args.fast :
-            #os.system("make fast-case-studies FAST=f 2>/dev/null")
             makeOut = subprocess.run("make fast-case-studies FAST=f 2>/dev/null", shell=True)
             if makeOut.returncode != 0 :
                 colorPrint(bcolors.FAIL, "Make failed with return code ", makeOut.returncode)
@@ -336,10 +333,9 @@ def main() :
                 EXCEPT_DIR.append("case-studies-regression/fast-tests/")
 
     diffOut = subprocess.run("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename, shell=True)
-    if diffOut.returncode == 0 or diffOut.returncode > 1 : # 0 if same files which normally shouldn't happen and > 1 if errors
+    if diffOut.returncode == 0 or diffOut.returncode > 1 : # 0 if same files which normally shouldn't happen (because of processing times) and > 1 if errors
         colorPrint(bcolors.FAIL, "Diff failed with return code ", diffOut.returncode)
         exit(1)
-    #os.system("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename) 
 
     splitFile(filename)
     
