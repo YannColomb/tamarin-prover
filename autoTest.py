@@ -92,6 +92,7 @@ def compareLines(line1, line2, filename) :
     fileErr = open(outTestsErrors, "a+")
     fileTime = open(outTestsTime, "a+")
     if "processing time" in line1 + line2 :
+        print("writing into outTestsTime", line1)
         colorWrite(bcolors.HEADER, "**" + filename.strip() + "**\n", fileTime)
         colorWrite(bcolors.OKBLUE, line1 + '\n' + line2 + '\n', fileTime)
     elif similar(line1, line2) <= LIMIT_ERROR_LINE :
