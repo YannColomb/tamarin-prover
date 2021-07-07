@@ -4,7 +4,7 @@ import sys
 import posixpath
 import argparse
 from difflib import SequenceMatcher
-
+import subprocess
 
 class bcolors:
     HEADER = '\033[95m'
@@ -92,7 +92,6 @@ def compareLines(line1, line2, filename) :
     fileErr = open(outTestsErrors, "a+")
     fileTime = open(outTestsTime, "a+")
     if "processing time" in line1 + line2 :
-        print("writing into outTestsTime", line1)
         colorWrite(bcolors.HEADER, "**" + filename.strip() + "**\n", fileTime)
         colorWrite(bcolors.OKBLUE, line1 + '\n' + line2 + '\n', fileTime)
     elif similar(line1, line2) <= LIMIT_ERROR_LINE :
@@ -306,9 +305,16 @@ def main() :
 
     if not OPT_NOM :
         if args.fast :
-            os.system("make fast-case-studies FAST=f 2>/dev/null")
+            #os.system("make fast-case-studies FAST=f 2>/dev/null")
+            makeOut = subprocess.run("make fast-case-studies FAST=f 2>/dev/null", shell=True)
+            if makeOut.returncode != 0 :
+                colorPrint(bcolors.FAIL, "Make failed with return code ", makeOut.returncode)
+                exit(1)
         else :
-            os.system("make case-studies 2>/dev/null")
+            makeOut = subprocess.run("make case-studies 2>/dev/null", shell=True)
+            if makeOut.returncode != 0 :
+                colorPrint(bcolors.FAIL, "Make failed with return code ", makeOut.returncode)
+                exit(1)
     
     
     ## Put all diff result in a file and format it into multiple files in a tmp directory ##
@@ -326,7 +332,11 @@ def main() :
             if not "case-studies-regression/fast-tests/" in EXCEPT_DIR :
                 EXCEPT_DIR.append("case-studies-regression/fast-tests/")
 
-    os.system("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename) 
+    diffOut = subprocess.run("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename, shell=True)
+    if diffOut.returncode == 0 or diffOut.returncode > 1 : # 0 if same files which normally shouldn't happen and > 1 if errors
+        colorPrint(bcolors.FAIL, "Diff failed with return code ", diffOut.returncode)
+        exit(1)
+    #os.system("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename) 
 
     splitFile(filename)
     

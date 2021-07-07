@@ -53,6 +53,3 @@ script:
   # - make sapic-case-studies
   - python3 autoTest.py --except-dir=sapic,dh,system.info -yes -dff -f
 
-notifications:
-  slack:
-    secure: Jbo4DleHEw22sDT4H4R0qY5yIkzho7u6uS0UKi9EYOe4o8ec8yrdkf3/VhyGdNvPHW+7I9RR6zFQ4j3iqJs5/TlT+Hfa4Duq9Epvr33SGuo/H8JXicly8QiWJunaTFz7t5kMttg/aUQcN8VAqwzkrUovB+gnHy9G6FmiKr1ejTQ=
