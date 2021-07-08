@@ -355,6 +355,7 @@ def main() :
     ## Add .gitkeep to folders to make travis work ##
     
     os.system("find case-studies/* -type d > directories.tmp")
+    os.system("touch case-studies/.gitkeep")
     for dir in open("directories.tmp") :
         os.system("touch " + dir.strip() + "/.gitkeep")
 
