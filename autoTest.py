@@ -352,10 +352,17 @@ def main() :
 
     paths.close()
     
+    ## Add .gitkeep to folders to make travis work ##
+    
+    os.system("find case-studies/* -type d > directories.tmp")
+    for dir in open("directories.tmp") :
+        os.system("touch " + dir.strip() + "/.gitkeep")
+
     ## Create a file with processing times before and after ##
 
     if OPT_TIME :
         processTimeResults()
+
 
     ## Displays ##
  
