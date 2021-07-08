@@ -5,10 +5,10 @@ TAMARIN=~/.local/bin/tamarin-prover
 SAPIC=~/.local/bin/sapic
 
 # Settings for fast testing
-ifneq ($(FAST), "y")  
-	SUBDIR=""
-else
+ifeq ($(FAST), "y")  
 	SUBDIR="fast-tests/"
+else
+	SUBDIR=
 endif
 
 # Default installation via stack, multi-threaded
