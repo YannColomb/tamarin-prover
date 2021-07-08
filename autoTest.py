@@ -358,6 +358,7 @@ def main() :
     os.system("touch case-studies/.gitkeep")
     for dir in open("directories.tmp") :
         os.system("touch " + dir.strip() + "/.gitkeep")
+    os.system("rm directories.tmp")
 
     ## Create a file with processing times before and after ##
 
