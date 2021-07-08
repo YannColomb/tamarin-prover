@@ -387,7 +387,8 @@ def main() :
     
     if not OPT_NOD :
         os.system("rm -rf " + dirtests)
-        os.system("rm " + outTestsTime)
+        if OPT_TIME :
+            os.system("rm " + outTestsTime)
         os.system("rm " + pathTmp)
         os.system("rm " + filename)
     
