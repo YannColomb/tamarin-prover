@@ -399,8 +399,7 @@ def main() :
     ## Remove useless files ##
     
     if not OPT_NOD :
-        if OPT_TIME :
-            os.system("rm " + outTestsTime)
+        os.system("rm " + outTestsTime)
         os.system("rm " + pathTmp)
         os.system("rm " + filename)
     
