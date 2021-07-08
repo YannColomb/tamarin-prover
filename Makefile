@@ -6,9 +6,9 @@ SAPIC=~/.local/bin/sapic
 
 # Settings for fast testing
 ifneq ($(FAST), "y")  
-	SUBDIR=/fast-tests/
-else
 	SUBDIR=/
+else
+	SUBDIR=/fast-tests/
 endif
 
 # Default installation via stack, multi-threaded
