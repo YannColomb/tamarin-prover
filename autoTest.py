@@ -310,7 +310,7 @@ def main() :
 
     if not OPT_NOM :
         if args.fast :
-            makeOut = subprocess.run("make fast-case-studies FAST=f 2>/dev/null", shell=True)
+            makeOut = subprocess.run("make fast-case-studies FAST=y 2>/dev/null", shell=True)
             if makeOut.returncode != 0 :
                 colorPrint(bcolors.FAIL, "Make failed with return code " + str(makeOut.returncode))
                 exit(1)
@@ -339,9 +339,8 @@ def main() :
 
     diffOut = subprocess.run("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename, shell=True)
     if diffOut.returncode == 0 or diffOut.returncode > 1 : # 0 if same files which normally shouldn't happen (because of processing times) and > 1 if errors
-        colorPrint(bcolors.FAIL, "Diff failed with return code ", diffOut.returncode)
+        colorPrint(bcolors.FAIL, "Diff failed with return code " + str(diffOut.returncode))
         exit(1)
-
     splitFile(filename)
     
 
@@ -383,14 +382,16 @@ def main() :
 
     ## Add .gitkeep to folders to make travis work ##
     
-    if OPT_NOKEEP :
+    if not OPT_NOKEEP :
         os.system("find case-studies/* -type d > directories.tmp")
         os.system("touch case-studies/.gitkeep")
         for dir in open("directories.tmp") :
             os.system("touch " + dir.strip() + "/.gitkeep")
         os.system("rm directories.tmp")
 
-        os.system("rm -rf " + dirtests + "/*")
+        os.system("rm -rf " + dirtests)
+        if not os.path.exists(dirtests):
+            os.makedirs(dirtests)
         os.system("touch " + dirtests + "/.gitkeep")
     else :
         os.system("rm -rf " + dirtests)

@@ -5,12 +5,10 @@ TAMARIN=~/.local/bin/tamarin-prover
 SAPIC=~/.local/bin/sapic
 
 # Settings for fast testing
-ifneq ($(FAST), "y")  
-	SUBDIR=/
-else
+SUBDIR=/
+ifdef FAST  
 	SUBDIR=/fast-tests/
 endif
-
 # Default installation via stack, multi-threaded
 # Try to install Tamarin
 default: tamarin
@@ -480,6 +478,7 @@ case-studies: 	case-studies$(SUBDIR)system.info $(CS_TARGETS)
 FAST_CS_TARGETS = case-studies$(SUBDIR)Tutorial_analyzed.spthy $(CCS15_PCS_TARGETS) $(TESTOBSEQ_TARGETS) $(FEATURES_CS_TARGETS) $(REGRESSION_OBSEQ_TARGETS) $(CSF12_CS_TARGETS) $(IND_CS_TARGETS) $(CCS15_CS_TARGETS)
 
 fast-case-studies: case-studies$(SUBDIR)system.info $(FAST_CS_TARGETS)
+	echo $(SUBDIR)
 	mkdir -p case-studies$(SUBDIR)
 	grep -R "verified\|falsified\|processing time" case-studies$(SUBDIR)
 	-grep -iR "warning\|error" case-studies$(SUBDIR)
