@@ -42,6 +42,7 @@ OPT_DFF = False
 OPT_YES = False
 OPT_NOD = False
 OPT_NOM = False
+OPT_NOKEEP = False
 
 SUCCESS = 0
 FAIL = -1
@@ -242,6 +243,7 @@ def main() :
     parser.add_argument("-yes", "--accept-recommanded-deletions", help = "Delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results.", action="store_true")
     parser.add_argument("-nod", "--no-delete", help = "Temporary files won't be deleted", action="store_true")
     parser.add_argument("-nom", "--no-make", help = "No make will be used. Only use if your working directories are already created.", action="store_true")
+    parser.add_argument("-nokeep", "--no-git-keep", help = "Won't recreate empty directories with .gitkeep in them", action="store_true")
 
     args = parser.parse_args()
     
@@ -281,6 +283,8 @@ def main() :
         listOfGlobals["OPT_NOD"] = True
     if args.no_make :
         listOfGlobals["OPT_NOM"] = True
+    if args.no_git_keep :
+        listOfGlobals["OPT_NOKEEP"] = True
 
     ## Init ##
 
@@ -353,13 +357,6 @@ def main() :
 
     paths.close()
     
-    ## Add .gitkeep to folders to make travis work ##
-    
-    os.system("find case-studies/* -type d > directories.tmp")
-    os.system("touch case-studies/.gitkeep")
-    for dir in open("directories.tmp") :
-        os.system("touch " + dir.strip() + "/.gitkeep")
-    os.system("rm directories.tmp")
 
     ## Create a file with processing times before and after ##
 
@@ -383,10 +380,24 @@ def main() :
     if DISPLAY_ERRORS :
         os.system("cat " + outTestsErrors)
 
+
+    ## Add .gitkeep to folders to make travis work ##
+    
+    if OPT_NOKEEP :
+        os.system("find case-studies/* -type d > directories.tmp")
+        os.system("touch case-studies/.gitkeep")
+        for dir in open("directories.tmp") :
+            os.system("touch " + dir.strip() + "/.gitkeep")
+        os.system("rm directories.tmp")
+
+        os.system("rm -rf " + dirtests + "/*")
+        os.system("touch " + dirtests + "/.gitkeep")
+    else :
+        os.system("rm -rf " + dirtests)
+
     ## Remove useless files ##
     
     if not OPT_NOD :
-        os.system("rm -rf " + dirtests)
         if OPT_TIME :
             os.system("rm " + outTestsTime)
         os.system("rm " + pathTmp)
