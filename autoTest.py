@@ -184,7 +184,7 @@ def processTimeResults() :
 def uniqLines(infilename, outfilename) :
     lines_seen = set()
     outfile = open(outfilename, "w")
-    unwantedChars = [chr(int("0x1b", 16)),"[0m","[95m","[91m3"]
+    unwantedChars = [chr(int("0x1b", 16)),"[0m","[95m","[91m3"] # These chars are used in colors. We only want to compare text and not color+text.
     tmpline = ""
     for line in open(infilename, "r") :
         tmpline = line

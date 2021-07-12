@@ -1,0 +1,7 @@
+maude tool: 'maude'
+ checking version: 2.7.1. OK.
+ checking installation: OK.
+
+
+analyzing: examples/sapic/fast/MoedersheimWebService/set-abstr.spthy
+
