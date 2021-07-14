@@ -111,7 +111,7 @@ def processFile(path) :
     for line in file :
         if line[0] == "<" or line[0] == ">" :
             listResult.append(line)
-        if "Seulement dans" in line :
+        if "Seulement dans" in line or "Only in" in line :
             colorWrite(bcolors.FAIL, line + '\n', fileErr)
             print(line)
     for i in range(1,len(listResult)) :
