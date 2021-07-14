@@ -31,18 +31,17 @@ CASE_DIR = "case-studies/"
 LIMIT_ERROR_LINE = 1            # Resemblance between 2 lines to know if there's an error
 OPT_WRITE_FILENAME = True       # Write filename in Err File
 OPT_WRITE_ALL_TIMES = False     # Write all times without condition
-OPT_TIME_GAP = 0.2              # Time difference allowed
+OPT_TIME_GAP = None              # Time difference allowed
 OPT_TIME = True                 # Display of time
 EXCEPT_DIR = None
-DISPLAY_TIMES = False
 DISPLAY_ERRORS = False
-GRADUATION_TIME = None
-NO_DUPLICATE = False
-OPT_DFF = False
-OPT_YES = False
-OPT_NOD = False
+GRADUATION_TIME = [0.3, 0.8]
+ALLOW_DUPLICATE = False
+OPT_DFF = True
+OPT_ASK = False
+OPT_NOD = False                 # option to delete temporary files
 OPT_NOM = False
-OPT_NOKEEP = False
+OPT_NOKEEP = True
 
 SUCCESS = 0
 FAIL = -1
@@ -106,16 +105,20 @@ def compareLines(line1, line2, filename) :
 ## Parse the file to finally compare lines ##
 def processFile(path) :
     file = open(path, "r")
+    fileErr = open(outTestsErrors, "a+")
     filename = file.readline()
     listResult = [filename]
     for line in file :
         if line[0] == "<" or line[0] == ">" :
             listResult.append(line)
-
+        if "Seulement dans" in line :
+            colorWrite(bcolors.FAIL, line + '\n', fileErr)
+            print(line)
     for i in range(1,len(listResult)) :
         if listResult[i][0] == "<" and listResult[i+1][0] == ">" :
             compareLines(listResult[i], listResult[i+1], filename)
 
+    fileErr.close()
     file.close()
 
 
@@ -160,6 +163,10 @@ def processTimeResults() :
                 if OPT_WRITE_FILENAME :
                     finalTimeFile.write(filename)
                 colorWrite(bcolors.OKBLUE, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
+            elif OPT_TIME_GAP and abs((time1 - time2)/time1) >= OPT_TIME_GAP :
+                if OPT_WRITE_FILENAME :
+                    finalTimeFile.write(filename)
+                colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
             elif GRADUATION_TIME :
                 if OPT_WRITE_FILENAME :
                     finalTimeFile.write(filename)
@@ -169,10 +176,7 @@ def processTimeResults() :
                     colorWrite(bcolors.WARNING, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
                 elif GRADUATION_TIME[1] < abs((time1 - time2)/time1) :
                     colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile)
-            elif abs((time1 - time2)/time1) >= OPT_TIME_GAP :
-                if OPT_WRITE_FILENAME :
-                    finalTimeFile.write(filename)
-                colorWrite(bcolors.FAIL, "old :  " + str(time1) + "s   -->   new :  " + str(time2) + "s\n", finalTimeFile )
+
             cpt = 0
         cpt += 1
 
@@ -225,7 +229,7 @@ def main() :
     ## Parse command line arguments ##
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-lel","--limit-error-line", help="Acceptable resemblance between two lines (from 0 to 1). Default = 1 (100% resemblance)", type=float)
+    parser.add_argument("-lel","--limit-error-line", help="Acceptable resemblance between two lines (from 0 to 1). Default = 1 (perfect match)", type=float)
     parser.add_argument("-nofn","--without-filename", help="Output time file won't contain filenames",
                     action="store_true")
     parser.add_argument("-showt","--show-all-times", help="Output files will contain all processing times without condition",
@@ -234,16 +238,15 @@ def main() :
     parser.add_argument("-notime","--without-times", help="Don't compute processing times",
                     action="store_true")
     parser.add_argument("-ed","--except-dir", help = "Run script ignoring a file/directory (csv format for two or more files/directories", type=str)
-    parser.add_argument("-dt","--display-times", help = "Display a comparison of processing times", action="store_true")
     parser.add_argument("-de", "--display-errors", help = "Display all errors", action="store_true")
-    parser.add_argument("-grad","--time-graduation", help = "2 csv thresholds (e.g. -grad=0.3,0.8) to color processing times (from 0 to 1). Do not combine this argument with -t.")
-    parser.add_argument("-nodup", "--no-duplicate", help = "Remove duplicates from output display", action="store_true")
+    parser.add_argument("-grad","--time-graduation", help = "2 csv thresholds (Default : -grad=0.3,0.8) to color processing times (from 0 to 1). Do not combine this argument with -t.")
+    parser.add_argument("-dup", "--allow-duplicate", help = "Keep duplicates from output display", action="store_true")
     parser.add_argument("-f", "--fast", help = "Run fast tests", action="store_true")
-    parser.add_argument("-dff", "--delete-final-files", help = "Delete final files to keep a proper working directory", action="store_true")
-    parser.add_argument("-yes", "--accept-recommanded-deletions", help = "Delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results.", action="store_true")
-    parser.add_argument("-nod", "--no-delete", help = "Temporary files won't be deleted", action="store_true")
-    parser.add_argument("-nom", "--no-make", help = "No make will be used. Only use if your working directories are already created.", action="store_true")
-    parser.add_argument("-nokeep", "--no-git-keep", help = "Won't recreate empty directories with .gitkeep in them", action="store_true")
+    parser.add_argument("-nodf", "--no-delete-final-files", help = "Won't delete final files (Debug)", action="store_true")
+    parser.add_argument("-ask", "--ask-for-deletions", help = "Ask Y/N questions to delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results. Default behaviour delete existing files without asking", action="store_true")
+    parser.add_argument("-nom", "--no-make", help = "No make will be used. Only use it if your working directories are already created.", action="store_true")
+    parser.add_argument("-wkeep", "--with-git-keep", help = "Recreate empty directories with .gitkeep in them", action="store_true")
+    parser.add_argument("-d", "--debug", help = "Run in debug mode. (Temporary files won't be deleted)", action="store_true")
 
     args = parser.parse_args()
     
@@ -263,28 +266,27 @@ def main() :
         listOfGlobals["OPT_TIME"] = False
     if args.except_dir :
         listOfGlobals["EXCEPT_DIR"] = args.except_dir.split(",")
-    if args.display_times :
-        listOfGlobals["DISPLAY_TIMES"] = True
     if args.display_errors :
         listOfGlobals["DISPLAY_ERRORS"] = True
     if args.time_graduation :
         list = args.time_graduation.split(",")
         listOfGlobals["GRADUATION_TIME"] = [float(list[0]),float(list[1])]
-    if args.no_duplicate :
-        listOfGlobals["NO_DUPLICATE"] = True
+    if args.allow_duplicate :
+        listOfGlobals["ALLOW_DUPLICATE"] = True
     if args.fast :
         listOfGlobals["CASE_DIR"] = "case-studies/fast-tests/"
         listOfGlobals["CASE_REG_DIR"] = "case-studies-regression/fast-tests/"
-    if args.delete_final_files :
-        listOfGlobals["OPT_DFF"] = True
-    if args.accept_recommanded_deletions :
-        listOfGlobals["OPT_YES"] = True
-    if args.no_delete :
-        listOfGlobals["OPT_NOD"] = True
+    if args.no_delete_final_files :
+        listOfGlobals["OPT_DFF"] = False
+    if args.ask_for_deletions :
+        listOfGlobals["OPT_ASK"] = True
     if args.no_make :
         listOfGlobals["OPT_NOM"] = True
-    if args.no_git_keep :
-        listOfGlobals["OPT_NOKEEP"] = True
+    if args.with_git_keep :
+        listOfGlobals["OPT_NOKEEP"] = False
+    if args.debug :
+        listOfGlobals["OPT_DFF"] = False
+        listOfGlobals["OPT_NOD"] = True
 
     ## Init ##
 
@@ -300,7 +302,7 @@ def main() :
     filesList = [outTestsTime, outTestsErrors, pathTmp, filename, finalTime]
     for fn in filesList :
         if os.path.exists(fn) :
-            if OPT_YES :
+            if not OPT_ASK :
                 os.system("rm " + fn)
             elif queryYesNo("File " + fn + " already exists. It may compromise your results. Do you want to delete it ?") :
                 os.system("rm " + fn)
@@ -366,8 +368,8 @@ def main() :
     ## Displays ##
  
 
-    if DISPLAY_TIMES and OPT_TIME :
-        if NO_DUPLICATE :
+    if OPT_TIME :
+        if not ALLOW_DUPLICATE :
             infn = finalTime
             outfn = "times.tmp"
             uniqLines(infn, outfn)
@@ -413,7 +415,7 @@ def main() :
             os.system("rm " + finalTime)
         return SUCCESS
     else :
-        print("Tests failed with " + str(nbrLines) + " lines")
+        colorPrint(bcolors.BOLD, "Tests failed with " + str(nbrLines) + " error lines")
         if OPT_DFF and not OPT_NOD :
             os.system("rm " + outTestsErrors)
             if OPT_TIME :

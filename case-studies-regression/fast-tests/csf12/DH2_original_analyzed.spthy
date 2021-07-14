@@ -1828,7 +1828,7 @@ analyzing: examples/csf12/DH2_original.spthy
 analyzed: examples/csf12/DH2_original.spthy
 
   output:          examples/csf12/DH2_original.spthy.tmp
-  processing time: 15.205435504s
+  processing time: 15.787482204s
   KAS_key_secrecy (all-traces): verified (503 steps)
 
 ------------------------------------------------------------------------------
@@ -1839,7 +1839,7 @@ summary of summaries:
 analyzed: examples/csf12/DH2_original.spthy
 
   output:          examples/csf12/DH2_original.spthy.tmp
-  processing time: 15.205435504s
+  processing time: 15.787482204s
   KAS_key_secrecy (all-traces): verified (503 steps)
 
 ==============================================================================
