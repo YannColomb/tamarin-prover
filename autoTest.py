@@ -44,7 +44,7 @@ OPT_NOM = False
 OPT_NOKEEP = True
 
 SUCCESS = 0
-FAIL = -1
+FAIL = 1
 
 ## Pretty print and write ##
 
@@ -413,18 +413,14 @@ def main() :
             os.system("rm " + outTestsErrors)
         if OPT_DFF and OPT_TIME and not OPT_NOD :
             os.system("rm " + finalTime)
-        return SUCCESS
+        exit(SUCCESS)
     else :
         colorPrint(bcolors.BOLD, "Tests failed with " + str(nbrLines) + " error lines")
         if OPT_DFF and not OPT_NOD :
             os.system("rm " + outTestsErrors)
             if OPT_TIME :
                 os.system("rm " + finalTime)
-        return FAIL
+        exit(FAIL)
 
     
-
-
-
-if __name__ == "__main__" :
-    main()
+main()
