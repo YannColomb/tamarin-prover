@@ -296,6 +296,7 @@ def main() :
     if args.display_computation_time :
         listOfGlobals["COMPUTE_TIME"] = True
 
+
     ## Init ##
 
     if not os.path.exists(dirtests):
