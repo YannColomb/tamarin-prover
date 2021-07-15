@@ -41,7 +41,8 @@ before_install:
 
 
 
-install: travis_wait 30 mvn install
+install:
+  - travis_wait 30 mvn install
   # pre-build 'mwc-random' and 'SHA' as otherwise Travis CI sometimes runs out of memory
   - stack --no-terminal build mwc-random SHA -j 1
   - stack --no-terminal install
