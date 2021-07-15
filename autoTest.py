@@ -229,22 +229,22 @@ def main() :
     ## Parse command line arguments ##
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-lel","--limit-error-line", help="Acceptable resemblance between two lines (from 0 to 1). Default = 1 (perfect match)", type=float)
+    parser.add_argument("-f", "--fast", help = "Run fast tests", action="store_true")
+    parser.add_argument("-ed","--except-dir", help = "Run script ignoring a file/directory (csv format for two or more files/directories", type=str)
+    parser.add_argument("-grad","--time-graduation", help = "2 csv thresholds (Default : -grad=0.3,0.8) to color processing times (from 0 to 1). Do not combine this argument with -t.")
     parser.add_argument("-nofn","--without-filename", help="Output time file won't contain filenames",
                     action="store_true")
+    parser.add_argument("-nom", "--no-make", help = "No make will be used. Only use it if your working directories are already created.", action="store_true")
     parser.add_argument("-showt","--show-all-times", help="Output files will contain all processing times without condition",
                     action="store_true")
     parser.add_argument("-t","--time-gap", help="Time difference (percentage) allowed (from 0 to 1)", type=float)
     parser.add_argument("-notime","--without-times", help="Don't compute processing times",
                     action="store_true")
-    parser.add_argument("-ed","--except-dir", help = "Run script ignoring a file/directory (csv format for two or more files/directories", type=str)
     parser.add_argument("-de", "--display-errors", help = "Display all errors", action="store_true")
-    parser.add_argument("-grad","--time-graduation", help = "2 csv thresholds (Default : -grad=0.3,0.8) to color processing times (from 0 to 1). Do not combine this argument with -t.")
     parser.add_argument("-dup", "--allow-duplicate", help = "Keep duplicates from output display", action="store_true")
-    parser.add_argument("-f", "--fast", help = "Run fast tests", action="store_true")
+    parser.add_argument("-lel","--limit-error-line", help="Acceptable resemblance between two lines (from 0 to 1). Default = 1 (perfect match)", type=float)
     parser.add_argument("-nodf", "--no-delete-final-files", help = "Won't delete final files (Debug)", action="store_true")
     parser.add_argument("-ask", "--ask-for-deletions", help = "Ask Y/N questions to delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results. Default behaviour delete existing files without asking", action="store_true")
-    parser.add_argument("-nom", "--no-make", help = "No make will be used. Only use it if your working directories are already created.", action="store_true")
     parser.add_argument("-wkeep", "--with-git-keep", help = "Recreate empty directories with .gitkeep in them", action="store_true")
     parser.add_argument("-d", "--debug", help = "Run in debug mode. (Temporary files won't be deleted)", action="store_true")
 
