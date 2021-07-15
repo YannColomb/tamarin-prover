@@ -55,4 +55,4 @@ install:
 script:
   - tamarin-prover test
   # - make sapic-case-studies
-  - travis_wait 30 python3 autoTest.py --except-dir=sapic,dh,system.info -notime -nofn -f
+  - python3 autoTest.py --except-dir=sapic,dh,system.info -notime -nofn -f
