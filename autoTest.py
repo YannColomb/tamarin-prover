@@ -34,7 +34,7 @@ OPT_WRITE_ALL_TIMES = False     # Write all times without condition
 OPT_TIME_GAP = None              # Time difference allowed
 OPT_TIME = True                 # Display of time
 EXCEPT_DIR = None
-DISPLAY_ERRORS = False
+DISPLAY_ERRORS = True
 GRADUATION_TIME = [0.3, 0.8]
 ALLOW_DUPLICATE = False
 OPT_DFF = True
@@ -239,7 +239,7 @@ def main() :
     parser.add_argument("-t","--time-gap", help="Time difference (percentage) allowed (from 0 to 1)", type=float)
     parser.add_argument("-notime","--without-times", help="Don't compute processing times",
                     action="store_true")
-    parser.add_argument("-de", "--display-errors", help = "Display all errors", action="store_true")
+    parser.add_argument("-node", "--no-display-errors", help = "Won't display errors", action="store_true")
     parser.add_argument("-dup", "--allow-duplicate", help = "Keep duplicates from output display", action="store_true")
     parser.add_argument("-lel","--limit-error-line", help="Acceptable resemblance between two lines (from 0 to 1). Default = 1 (perfect match)", type=float)
     parser.add_argument("-nodf", "--no-delete-final-files", help = "Won't delete final files (Debug)", action="store_true")
@@ -265,8 +265,8 @@ def main() :
         listOfGlobals["OPT_TIME"] = False
     if args.except_dir :
         listOfGlobals["EXCEPT_DIR"] = args.except_dir.split(",")
-    if args.display_errors :
-        listOfGlobals["DISPLAY_ERRORS"] = True
+    if args.no_display_errors :
+        listOfGlobals["DISPLAY_ERRORS"] = False
     if args.time_graduation :
         list = args.time_graduation.split(",")
         listOfGlobals["GRADUATION_TIME"] = [float(list[0]),float(list[1])]
@@ -317,10 +317,9 @@ def main() :
                 exit(1)
         else :
             makeOut = subprocess.run("make case-studies 2>/dev/null", shell=True)
-            # This make command crashes with return code 2 because of examples/sapic/fast/MoedersheimWebService/set-abstr.spthy
-            #if makeOut.returncode != 0 :
-                #colorPrint(bcolors.FAIL, "Make failed with return code " + str(makeOut.returncode))
-                #exit(1)
+            if makeOut.returncode != 0 :
+                colorPrint(bcolors.FAIL, "Make failed with return code " + str(makeOut.returncode))
+                exit(1)
     
     
     ## Put all diff result in a file and format it into multiple files in a tmp directory ##
