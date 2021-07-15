@@ -113,7 +113,6 @@ def processFile(path) :
             listResult.append(line)
         if "Seulement dans" in line or "Only in" in line :
             colorWrite(bcolors.FAIL, line + '\n', fileErr)
-            print(line)
     for i in range(1,len(listResult)) :
         if listResult[i][0] == "<" and listResult[i+1][0] == ">" :
             compareLines(listResult[i], listResult[i+1], filename)
