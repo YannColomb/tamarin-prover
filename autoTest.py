@@ -5,6 +5,7 @@ import posixpath
 import argparse
 from difflib import SequenceMatcher
 import subprocess
+from time import time
 
 class bcolors:
     HEADER = '\033[95m'
@@ -42,6 +43,7 @@ OPT_ASK = False
 OPT_NOD = False                 # option to delete temporary files
 OPT_NOM = False
 OPT_NOKEEP = True
+COMPUTE_TIME = False
 
 SUCCESS = 0
 FAIL = 1
@@ -108,6 +110,8 @@ def processFile(path) :
     fileErr = open(outTestsErrors, "a+")
     filename = file.readline()
     listResult = [filename]
+    if "Seulement dans" in filename or "Only in" in filename :
+        colorWrite(bcolors.FAIL, filename + '\n', fileErr)
     for line in file :
         if line[0] == "<" or line[0] == ">" :
             listResult.append(line)
@@ -225,6 +229,8 @@ def queryYesNo(question, default="yes"):
 
 def main() :    
 
+    t1 = time()
+
     ## Parse command line arguments ##
 
     parser = argparse.ArgumentParser()
@@ -246,6 +252,7 @@ def main() :
     parser.add_argument("-ask", "--ask-for-deletions", help = "Ask Y/N questions to delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results. Default behaviour delete existing files without asking", action="store_true")
     parser.add_argument("-wkeep", "--with-git-keep", help = "Recreate empty directories with .gitkeep in them", action="store_true")
     parser.add_argument("-d", "--debug", help = "Run in debug mode. (Temporary files won't be deleted)", action="store_true")
+    parser.add_argument("-time", "--display-computation-time", help = "Display the total duration of the script", action="store_true")
 
     args = parser.parse_args()
     
@@ -286,6 +293,8 @@ def main() :
     if args.debug :
         listOfGlobals["OPT_DFF"] = False
         listOfGlobals["OPT_NOD"] = True
+    if args.display_computation_time :
+        listOfGlobals["COMPUTE_TIME"] = True
 
     ## Init ##
 
@@ -379,6 +388,10 @@ def main() :
     if DISPLAY_ERRORS :
         os.system("cat " + outTestsErrors)
 
+
+    if COMPUTE_TIME :
+        t = time() - t1
+        colorPrint(bcolors.OKCYAN, "Total computation time : " + str(t) + "s (around "+str(round(t/60,3)) + " min)")
 
     ## Add .gitkeep to folders to make travis work ##
     
