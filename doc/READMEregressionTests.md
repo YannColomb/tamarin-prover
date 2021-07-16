@@ -203,3 +203,10 @@ To execute this script on Travis, you should think about two things :
 
 The Makefile is also important. To make the `fast-case-studies` (used in the script with the fast tests), you should use the command `make fast-case-studies FAST=y`. If you don't precise `FAST=y`, the files will be in the directory `case-studies` and not `case-studies/fast-tests` and the script won't work.
 
+
+
+
+
+## Contact
+
+For any problem, please contact Yann Colomb at yann.colomb@outlook.fr.
