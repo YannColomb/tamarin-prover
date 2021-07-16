@@ -43,7 +43,7 @@ OPT_ASK = False
 OPT_NOD = False                 # option to delete temporary files
 OPT_NOM = False
 OPT_NOKEEP = True
-COMPUTE_TIME = False
+NO_DUR = False
 
 SUCCESS = 0
 FAIL = 1
@@ -252,7 +252,7 @@ def main() :
     parser.add_argument("-ask", "--ask-for-deletions", help = "Ask Y/N questions to delete existing files at the beginning of the script to overwrite them. Not deleting them can compromise the results. Default behaviour delete existing files without asking", action="store_true")
     parser.add_argument("-wkeep", "--with-git-keep", help = "Recreate empty directories with .gitkeep in them", action="store_true")
     parser.add_argument("-d", "--debug", help = "Run in debug mode. (Temporary files won't be deleted)", action="store_true")
-    parser.add_argument("-time", "--display-computation-time", help = "Display the total duration of the script", action="store_true")
+    parser.add_argument("-nodur", "--display-duration", help = "Won't display the total duration of the script", action="store_true")
 
     args = parser.parse_args()
     
@@ -293,8 +293,8 @@ def main() :
     if args.debug :
         listOfGlobals["OPT_DFF"] = False
         listOfGlobals["OPT_NOD"] = True
-    if args.display_computation_time :
-        listOfGlobals["COMPUTE_TIME"] = True
+    if args.display_duration :
+        listOfGlobals["NO_DUR"] = True
 
 
     ## Init ##
@@ -390,7 +390,7 @@ def main() :
         os.system("cat " + outTestsErrors)
 
 
-    if COMPUTE_TIME :
+    if not NO_DUR :
         t = time() - t1
         colorPrint(bcolors.OKCYAN, "Total computation time : " + str(t) + "s (around "+str(round(t/60,3)) + " min)")
 
