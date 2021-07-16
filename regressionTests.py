@@ -7,7 +7,7 @@ from difflib import SequenceMatcher
 import subprocess
 from time import time
 
-class bcolors:
+class bcolors:          # Colors for colorPrint and colorWrite functions
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -18,6 +18,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+# Filenames or directory names
 filename = "testoutput.txt"
 dirtests = "tests"
 pathTmp = "path.tmp"
@@ -25,25 +26,25 @@ outTestsErrors = "testsResults_errors.txt"
 outTestsTime = "testsResults_time.txt"
 finalTime = "testsTimeResults.txt"
 
-
 CASE_REG_DIR = "case-studies-regression/"
 CASE_DIR = "case-studies/"
 
+# Constants used to configure the script
 LIMIT_ERROR_LINE = 1            # Resemblance between 2 lines to know if there's an error
 OPT_WRITE_FILENAME = True       # Write filename in Err File
 OPT_WRITE_ALL_TIMES = False     # Write all times without condition
-OPT_TIME_GAP = None              # Time difference allowed
+OPT_TIME_GAP = None             # Time difference allowed
 OPT_TIME = True                 # Display of time
-EXCEPT_DIR = None
-DISPLAY_ERRORS = True
-GRADUATION_TIME = [0.3, 0.8]
-ALLOW_DUPLICATE = False
-OPT_DFF = True
-OPT_ASK = False
-OPT_NOD = False                 # option to delete temporary files
-OPT_NOM = False
-OPT_NOKEEP = True
-NO_DUR = False
+EXCEPT_DIR = None               # Remove directories from the comparison
+DISPLAY_ERRORS = True           # Display of errors
+GRADUATION_TIME = [0.3, 0.8]    # Colorization of processing times
+ALLOW_DUPLICATE = False         # Output can't show duplicates by default
+OPT_DFF = True                  # Delete final files by default
+OPT_ASK = False                 # Won't ask to delete files at the beggining of the script by default. (Not deleting them can corrupt the results)
+OPT_NOD = False                 # Option to delete temporary files
+OPT_NOM = False                 # Make by default
+OPT_NOKEEP = True               # Won't recreate directories with .gitkeep in them by default
+NO_DUR = False                  # Show total duration by default
 
 SUCCESS = 0
 FAIL = 1
@@ -70,15 +71,15 @@ def splitFile(filename) :
     pat = "diff -r"
     if EXCEPT_DIR != None :
         for dir in EXCEPT_DIR :
-            pat += " '--exclude=" + dir + "'"
+            pat += " '--exclude=" + dir + "'"   # Each --exclude argument appears in diff command output, we remove them
     fs = files()
     outfile = next(fs) 
 
     with open(filename) as infile:
         for line in infile:
-            if pat not in line:
-                outfile.write(line)
-            else:
+            if pat not in line:                # If the line does not contain "diff -r '--exclude=...'"
+                outfile.write(line)                 # the line is good to be written
+            else:                              # Else, we remove it and then we write the line into the file
                 items = line.split(pat)
                 outfile.write(items[0])
                 for item in items[1:]:
@@ -110,12 +111,12 @@ def processFile(path) :
     fileErr = open(outTestsErrors, "a+")
     filename = file.readline()
     listResult = [filename]
-    if "Seulement dans" in filename or "Only in" in filename :
+    if "Seulement dans" in filename or "Only in" in filename :      # If a file is not either in case-studies or in case-studies-regression
         colorWrite(bcolors.FAIL, filename + '\n', fileErr)
     for line in file :
-        if line[0] == "<" or line[0] == ">" :
+        if line[0] == "<" or line[0] == ">" :                       # Only take lines that show a "before" or "after" in the output of diff command
             listResult.append(line)
-        if "Seulement dans" in line or "Only in" in line :
+        if "Seulement dans" in line or "Only in" in line :          # If a file is not either in case-studies or in case-studies-regression
             colorWrite(bcolors.FAIL, line + '\n', fileErr)
     for i in range(1,len(listResult)) :
         if listResult[i][0] == "<" and listResult[i+1][0] == ">" :
@@ -138,7 +139,7 @@ def extractFloat(line) :
 
 ## Parse the file of processing times and write in another file a pretty version for display ##
 def processTimeResults() :
-    fileTime = open(outTestsTime, "r")
+    fileTime = open(outTestsTime, "r")          # This file contains a 5 steps repetition pattern, used below
     finalTimeFile = open(finalTime, "w")
 
     cpt = 1
@@ -147,21 +148,23 @@ def processTimeResults() :
     filename = ""
     for line in fileTime :
         
-        if cpt == 1 :
+        if cpt == 1 :                           # Step 1 : First line contains filename
             filename = line
-        if cpt == 2 :
+        if cpt == 2 :                           # Step 2 : Second line contains the old/reference processing time
             if line.strip() == "" or extractFloat(line) == []:
                 cpt += 1
                 continue
             time1 = extractFloat(line)[0]
-        if cpt == 4 :
+                                                # Step 3 : An empty line
+        if cpt == 4 :                           # Step 4 : Fourth line contains the new processing time
             if line.strip() == "" or extractFloat(line) == [] :
                 cpt += 1
                 continue
             time2 = extractFloat(line)[0]
-        if cpt == 5 :            
+        if cpt == 5 :                           # Step 5 : An empty line ==> We now write the old and new processing times into a file
             if time1 == 0 or time2 == 0 :
                 print("ERROR : file : " + filename + " contains a null time")
+            # In order of importance : show-all-times -> time-gap -> graduation-time. Only one of the third options can be selected.
             elif OPT_WRITE_ALL_TIMES :
                 if OPT_WRITE_FILENAME :
                     finalTimeFile.write(filename)
@@ -256,6 +259,8 @@ def main() :
 
     args = parser.parse_args()
     
+    ## Define global variables depending on command line arguments ##
+
     listOfGlobals = globals()
     if args.limit_error_line :
         listOfGlobals["LIMIT_ERROR_LINE"] = args.limit_error_line
@@ -407,7 +412,7 @@ def main() :
         if not os.path.exists(dirtests):
             os.makedirs(dirtests)
         os.system("touch " + dirtests + "/.gitkeep")
-    else :
+    elif not OPT_NOD :
         os.system("rm -rf " + dirtests)
 
     ## Remove useless files ##
@@ -417,6 +422,7 @@ def main() :
         os.system("rm " + pathTmp)
         os.system("rm " + filename)
     
+    ## And check for errors ##
 
     nbrLines = sum(1 for line in open(outTestsErrors))
     if nbrLines == 0 :                                  # if no errors

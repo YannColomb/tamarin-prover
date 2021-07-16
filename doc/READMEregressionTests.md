@@ -1,8 +1,8 @@
-# AutoTest - CI for Tamarin Prover
+# RegressionTests - CI for Tamarin Prover
 
 
 
-AutoTest is a script that runs tests for Tamarin either locally or on [Travis](https://travis-ci.com/github/tamarin-prover/tamarin-prover). 
+RegressionTests is a script that runs tests for Tamarin either locally or on [Travis](https://travis-ci.com/github/tamarin-prover/tamarin-prover). 
 
 
 
@@ -19,12 +19,36 @@ $ cd tamarin-prover
 and type :
 
 ```bash
-$ python3 autoTest.py
+$ python3 regressionTests.py
 ```
 
 This command will first `make` the tests `case-studies` and then compare the results with the reference directory `case-studies-regression`. 
 
 (Warning : make command can take more than an hour to run)
+
+
+
+## Common usage
+
+### Locally 
+
+A common usage on your own computer is to execute the tests by running :
+
+```bash
+$ python3 regressionTests.py --except-dir=system.info,sapic,dh -f
+```
+
+This command will launch the tests in fast mode without considering system.info file nor sapic and dh directories.
+
+You can also remove the `-f` to run in normal mode.
+
+### On Travis
+
+To run this script on Travis, the best is to use the following command :
+
+ ```bash
+ python3 regressionTests.py --except-dir=sapic,dh,system.info -notime -nofn -f
+ ```
 
 
 
@@ -38,7 +62,7 @@ This argument is used to run tests in fast mode (around 10 minutes instead of an
 
 It uses the `case-studies/fast-tests` directory and compare it to the `case-studies-regression/fast-tests` directory.
 
-This argument need to be used in Travis or else the build won't pass due to either a lack of memory error (137) or a "no output received in the last 10m" error. 
+This argument need to be used in Travis or else the build won't pass due to either a lack of memory error (*error 137*) or a "*no output received in the last 10m*" error. 
 
 
 
@@ -163,3 +187,19 @@ Use this argument to run the script in debug mode. This won't delete useful temp
 To add new files to test, you have to put a reference file in the `case-studies-regression` directory. This reference file **must** **be** an output of a make command.
 
 If you want to add it in fast-tests (and so in Travis), you need to add a Target in the Makefile after `fast-case-studies` and to add the reference file in the `case-studies-regression/fast-tests` subdirectory.
+
+
+
+## Travis
+
+To execute this script on Travis, you should think about two things :
+
+- Create all directories and subdirectories in `case-studies` in the `before_install` part of your file `.travis.yml`. Something like this : `  - mkdir -p case-studies case-studies/ake ...`
+- Add the following command in the script part : `python3 regressionTests.py --except-dir=sapic,dh,system.info -notime -nofn -f`
+
+
+
+## Makefile
+
+The Makefile is also important. To make the `fast-case-studies` (used in the script with the fast tests), you should use the command `make fast-case-studies FAST=y`. If you don't precise `FAST=y`, the files will be in the directory `case-studies` and not `case-studies/fast-tests` and the script won't work.
+
