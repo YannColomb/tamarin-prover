@@ -38,7 +38,7 @@ A common usage on your own computer is to execute the tests by running :
 $ python3 regressionTests.py --except-dir=system.info,sapic,dh -f
 ```
 
-This command will launch the tests in fast mode without considering system.info file nor sapic and dh directories.
+This command will launch the tests in **fast** mode without considering *system.info* file nor *sapic* and *dh* directories.
 
 You can also remove the `-f` to run in normal mode.
 
