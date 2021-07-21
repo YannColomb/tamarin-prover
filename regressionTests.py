@@ -347,9 +347,9 @@ def main() :
     if not args.fast :
             excluded += " '--exclude=case-studies/fast-tests/' "
             excluded += " '--exclude=case-studies-regression/fast-tests/' "
-            if not "case-studies/fast-tests/" in EXCEPT_DIR :
+            if EXCEPT_DIR and not "case-studies/fast-tests/" in EXCEPT_DIR :
                 EXCEPT_DIR.append("case-studies/fast-tests/")
-            if not "case-studies-regression/fast-tests/" in EXCEPT_DIR :
+            if EXCEPT_DIR and not "case-studies-regression/fast-tests/" in EXCEPT_DIR :
                 EXCEPT_DIR.append("case-studies-regression/fast-tests/")
 
     diffOut = subprocess.run("diff " + CASE_REG_DIR + " " + CASE_DIR + " -r " + excluded + " > " + filename, shell=True)
